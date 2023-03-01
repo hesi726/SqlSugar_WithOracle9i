@@ -298,7 +298,12 @@ namespace SqlSugar
             }
             else
             {
-                IAdo result = CreateInstance<IAdo>(GetClassName(currentConnectionConfig.DbType.ToString(), "Provider"));
+                var className = GetClassName(currentConnectionConfig.DbType.ToString(), "Provider");
+                if (currentConnectionConfig.DbType == DbType.Oracle && currentConnectionConfig.UseOracleClient)
+                {
+                    className = UtilConstants.AssemblyName + ".OracleClientProvider";
+                }
+                IAdo result = CreateInstance<IAdo>(className);
                 return result;
             }
         }

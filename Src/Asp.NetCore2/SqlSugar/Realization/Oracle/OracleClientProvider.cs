@@ -1,4 +1,4 @@
-using Oracle.ManagedDataAccess.Client;
+using System.Data.OracleClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,48 +7,53 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 namespace SqlSugar
 {
-    public class OracleProvider : AdoProvider
+    /// <summary>
+    /// 使用 System.Data.OracleClient 作为 Oracle数据提供者的
+    /// </summary>
+    public class OracleClientProvider : AdoProvider
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="useOracleClient"></param>
-        public OracleProvider()
+        public OracleClientProvider()
         {
-            this.FormatSql = sql =>
-            {
+            this.FormatSql = sql => {
                 sql = sql.Replace("+@", "+:");
-                if (sql.HasValue()&&sql.Contains("@")) {
+                if (sql.HasValue() && sql.Contains("@"))
+                {
                     var exceptionalCaseInfo = Regex.Matches(sql, @"\'[^\=]*?\@.*?\'|[\.,\w]+\@[\.,\w]+ | [\.,\w]+\@[\.,\w]+|[\.,\w]+\@[\.,\w]+ |\d+\@\d|\@\@");
-                    if (exceptionalCaseInfo != null) {
+                    if (exceptionalCaseInfo != null)
+                    {
                         foreach (var item in exceptionalCaseInfo.Cast<Match>())
                         {
-                            if (item.Value != null && item.Value.IndexOf(",") == 1&&Regex.IsMatch(item.Value, @"^ \,\@\w+$")) 
+                            if (item.Value != null && item.Value.IndexOf(",") == 1 && Regex.IsMatch(item.Value, @"^ \,\@\w+$"))
                             {
                                 continue;
                             }
-                            else if (item.Value != null &&Regex.IsMatch(item.Value.Trim(), @"^\w+\,\@\w+\,$"))
+                            else if (item.Value != null && Regex.IsMatch(item.Value.Trim(), @"^\w+\,\@\w+\,$"))
                             {
                                 continue;
                             }
-                            else if (item.Value != null &&  item.Value.ObjToString().Contains("||") && Regex.IsMatch(item.Value.Replace(" ","").Trim(), @"\|\|@\w+\|\|"))
+                            else if (item.Value != null && item.Value.ObjToString().Contains("||") && Regex.IsMatch(item.Value.Replace(" ", "").Trim(), @"\|\|@\w+\|\|"))
                             {
                                 continue;
                             }
-                            else if (item.Value != null&& Regex.IsMatch(item.Value.Replace(" ", "").Trim(), @"\(\@\w+\,"))
+                            else if (item.Value != null && Regex.IsMatch(item.Value.Replace(" ", "").Trim(), @"\(\@\w+\,"))
                             {
                                 continue;
                             }
-                            else if (item.Value != null &&item.Value.Contains("=")&& Regex.IsMatch(item.Value, @"\w+ \@\w+[ ]{0,1}\=[ ]{0,1}\'"))
+                            else if (item.Value != null && item.Value.Contains("=") && Regex.IsMatch(item.Value, @"\w+ \@\w+[ ]{0,1}\=[ ]{0,1}\'"))
                             {
                                 continue;
                             }
                             sql = sql.Replace(item.Value, item.Value.Replace("@", UtilConstants.ReplaceKey));
                         }
                     }
-                    sql = sql .Replace("@",":");
+                    sql = sql.Replace("@", ":");
                     sql = sql.Replace(UtilConstants.ReplaceKey, "@");
                 }
                 return sql;
@@ -68,8 +73,8 @@ namespace SqlSugar
                 try
                 {
                     if (base._DbConnection == null)
-                    {                       
-                        base._DbConnection = new Oracle.ManagedDataAccess.Client.OracleConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                    {
+                        base._DbConnection = new OracleConnection(base.Context.CurrentConnectionConfig.ConnectionString);
                     }
                 }
                 catch (Exception ex)
@@ -103,16 +108,16 @@ namespace SqlSugar
         }
         public override IDataAdapter GetAdapter()
         {
-            return new MyOracleDataAdapter();
+            return new MyOracleClientDataAdapter();
         }
         public override DbCommand GetCommand(string sql, SugarParameter[] parameters)
         {
             sql = ReplaceKeyWordParameterName(sql, parameters);
             OracleCommand sqlCommand = new OracleCommand(sql, (OracleConnection)this.Connection);
-            sqlCommand.BindByName = true;
+            // sqlCommand.n = true;
             sqlCommand.CommandType = this.CommandType;
             sqlCommand.CommandTimeout = this.CommandTimeOut;
-            sqlCommand.InitialLONGFetchSize = -1;
+            // sqlCommand.InitialLONGFetchSize = -1;
             if (this.Transaction != null)
             {
                 sqlCommand.Transaction = (OracleTransaction)this.Transaction;
@@ -159,7 +164,7 @@ namespace SqlSugar
         };
         public override void SetCommandToAdapter(IDataAdapter dataAdapter, DbCommand command)
         {
-            ((MyOracleDataAdapter)dataAdapter).SelectCommand = (OracleCommand)command;
+            ((MyOracleClientDataAdapter)dataAdapter).SelectCommand = (OracleCommand)command;
         }
         /// <summary>
         /// if mysql return MySqlParameter[] pars
@@ -189,21 +194,23 @@ namespace SqlSugar
                 }
                 if (parameter.IsRefCursor)
                 {
-                    sqlParameter.OracleDbType = OracleDbType.RefCursor;
+                    sqlParameter.OracleType = OracleType.Cursor;
                 }
-                if (parameter.IsNvarchar2&& parameter.DbType==System.Data.DbType.String)
+                if (parameter.IsNvarchar2 && parameter.DbType == System.Data.DbType.String)
                 {
-                    sqlParameter.OracleDbType = OracleDbType.NVarchar2;
+                    sqlParameter.OracleType = OracleType.NVarChar;
                 }
                 if (parameter.IsClob)
                 {
-                    sqlParameter.OracleDbType = OracleDbType.Clob;
+                    sqlParameter.OracleType = OracleType.Clob;
                     sqlParameter.Value = parameter.Value;
                 }
                 if (parameter.IsArray)
                 {
-                    sqlParameter.OracleDbType = OracleDbType.Varchar2;
-                    sqlParameter.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+                    throw new Exception("不支持传入数组作为参数");
+                    //sqlParameter.OracleDbType = OracleDbType.Varchar2;
+                    //sqlParameter.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+
                 }
                 if (sqlParameter.DbType == System.Data.DbType.Guid)
                 {
@@ -272,6 +279,33 @@ namespace SqlSugar
                 ++index;
             }
             return result;
+        }
+
+        public override IDataReader GetDataReader(string sql, object parameters)
+        {
+            var result = base.GetDataReader(sql, parameters); result.GetSchemaTable(); return result;
+        }
+        public override IDataReader GetDataReader(string sql, params SugarParameter[] parameters)
+        {
+            var result = base.GetDataReader(sql, parameters); result.GetSchemaTable(); return result;
+        }
+        public override IDataReader GetDataReader(string sql, List<SugarParameter> parameters)
+        {
+            var result = base.GetDataReader(sql, parameters); result.GetSchemaTable(); return result;
+        }
+
+
+        public override async Task<IDataReader> GetDataReaderAsync(string sql, object parameters)
+        {
+            var result = await base.GetDataReaderAsync(sql, parameters); result.GetSchemaTable(); return result;
+        }
+        public override async Task<IDataReader> GetDataReaderAsync(string sql, params SugarParameter[] parameters)
+        {
+            var result = await base.GetDataReaderAsync(sql, parameters); result.GetSchemaTable(); return result;
+        }
+        public override async Task<IDataReader> GetDataReaderAsync(string sql, List<SugarParameter> parameters)
+        {
+            var result = await base.GetDataReaderAsync(sql, parameters); result.GetSchemaTable(); return result;
         }
     }
 }

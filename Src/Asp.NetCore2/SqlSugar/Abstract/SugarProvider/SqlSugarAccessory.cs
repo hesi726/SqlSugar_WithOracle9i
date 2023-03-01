@@ -383,7 +383,8 @@ namespace SqlSugar
                     DependencyManagement.TrySqlite();
                     break;
                 case DbType.Oracle:
-                    DependencyManagement.TryOracle();
+                    if (config.UseOracleClient) DependencyManagement.TryOracleClient();
+                    else DependencyManagement.TryOracle();
                     break;
                 case DbType.PostgreSQL:
                     DependencyManagement.TryPostgreSQL();

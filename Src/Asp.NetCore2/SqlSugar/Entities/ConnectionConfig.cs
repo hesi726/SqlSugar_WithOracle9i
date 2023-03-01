@@ -66,6 +66,11 @@ namespace SqlSugar
         /// 
         /// </summary>
         public SqlMiddle SqlMiddle { get;  set; }
+
+        /// <summary>
+        /// 使用 System.Data.OracleClient作为驱动;
+        /// </summary>
+        public bool UseOracleClient { get; set; }
     }
     public class SqlMiddle
     {
