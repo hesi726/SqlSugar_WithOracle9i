@@ -68,7 +68,7 @@ namespace SqlSugar
             var columns = dt.Columns;
             var rows = dt.Rows;
             using (System.Data.OracleClient.OracleDataReader dr = command.ExecuteReader())
-            {
+            {                
                 for (int i = 0; i < dr.FieldCount; i++)
                 {
                     string name = dr.GetName(i).Trim();

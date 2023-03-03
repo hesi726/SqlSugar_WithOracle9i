@@ -56,6 +56,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OdbcTest", "OdbcTest\OdbcTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSugar.OdbcCore", "SqlSugar.OdbcCore\SqlSugar.OdbcCore.csproj", "{0320D162-4E7F-4AA1-844B-2FDF77EEC145}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Data.OracleClient", "..\..\..\..\White_Horse\Wh_Net_Develop\ThirdLibrary\System.Data.OracleClient-master\src\System.Data.OracleClient.csproj", "{37900EAD-FE60-44AA-9A9B-BBBE309EF665}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -342,6 +344,18 @@ Global
 		{0320D162-4E7F-4AA1-844B-2FDF77EEC145}.Release|ARM32.Build.0 = Release|Any CPU
 		{0320D162-4E7F-4AA1-844B-2FDF77EEC145}.Release|x86.ActiveCfg = Release|Any CPU
 		{0320D162-4E7F-4AA1-844B-2FDF77EEC145}.Release|x86.Build.0 = Release|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Debug|ARM32.ActiveCfg = Debug|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Debug|ARM32.Build.0 = Debug|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Debug|x86.Build.0 = Debug|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Release|ARM32.ActiveCfg = Release|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Release|ARM32.Build.0 = Release|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Release|x86.ActiveCfg = Release|Any CPU
+		{37900EAD-FE60-44AA-9A9B-BBBE309EF665}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

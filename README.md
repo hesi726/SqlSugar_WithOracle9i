@@ -3,7 +3,66 @@
     <span>English</span> |  
     <a  href="https://www.donet5.com/Home/Doc"><font color="red">中文</font></a>
 </p>
+
+## 添加 Oracle9i 数据库的支持 (add the oracle9i support)
+
+* Copy <a href='https://github.com/SignalRT/System.Data.OracleClient'>https://github.com/SignalRT/System.Data.OracleClient</a> project to this solution.(that project must recompile.)
+* Config the oracle client, see <a href='./CSharp_Connect_Oracle9i.md'>CSharp_Connect_Oracle9i.md</a>.
+* use the follows code to connect to oracle.
  
+```
+                ConnectionConfig odbcConfig = new ConnectionConfig {
+                    ConnectionString =  @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.20.10.8)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=test)));User Id=test;Password=test",                   
+                    DbType = SqlSugar.DbType.Oracle,
+                    IsAutoCloseConnection = true,
+                    UseOracleClient = true
+                };
+
+                Console.WriteLine("连接字符串");
+                    Console.WriteLine(odbcConfig.ConnectionString);
+                
+                Console.WriteLine($"成功创建 OracleConnection 连接");
+                    OracleConnection odbcconn = new OracleConnection(odbcConfig.ConnectionString);
+                    odbcconn.Open();
+                    odbcconn.Close();
+                
+                Console.WriteLine($"使用 SqlSugar 去操作数据库");
+                    SqlSugarClient db = new SqlSugarClient(odbcConfig);
+                    var dept = db.Queryable<SugarDEPT>().Where(x => x.DEPTNO == 10).First();
+                    Console.WriteLine(JsonConvert.SerializeObject(dept));
+                    dept.LOC = "Longdon";
+                    var update = db.Updateable<SugarDEPT>(dept).ExecuteCommand();                    
+
+                    var newdept = new SugarDEPT { DNAME = "Wu流芳", LOC = "Chicago" };
+                    var inrows = db.Insertable<SugarDEPT>(newdept).ExecuteCommand();
+                    Console.WriteLine($"insert: {inrows}，注意, ExecuteCommand 不会回填自动填充的字段，例如 时间戳,identity,seq_xxx.nextval填充的id ");
+                    Console.WriteLine(JsonConvert.SerializeObject(newdept));
+
+                    newdept = new SugarDEPT { DNAME = "Wu流芳", LOC = "Chicago" };
+                    newdept = db.Insertable<SugarDEPT>(newdept).ExecuteReturnEntity();
+                    Console.WriteLine($"insert -- ExecuteReturnEntity 会回填自动填充的字段");
+                    Console.WriteLine(JsonConvert.SerializeObject(newdept));
+
+                    var delRows = db.Deleteable<SugarDEPT>(newdept).ExecuteCommand(); //删除数据
+                    Console.WriteLine($"delete -- {delRows}");
+```
+
+```
+    /// <summary>
+    /// SCOTT.DEPT 表.
+    /// </summary>
+
+    [SugarTable("SCOTT.DEPT")]
+    public class SugarDEPT
+    {
+        [SugarColumn(IsPrimaryKey = true,OracleSequenceName = "scott.seq_dept")]
+        public int DEPTNO { get; set; }
+
+        public string DNAME { get; set; }
+
+        public string LOC { get; set; }
+    }
+```
 
 ## SqlSugar ORM
   
